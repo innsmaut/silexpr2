@@ -4,12 +4,17 @@ require_once __DIR__.'/../vendor/autoload.php';
 
 require_once 'dbNegotiator.php';
 
+use Silex\Provider\TwigServiceProvider;
+use Silex\Provider\UrlGeneratorServiceProvider;
+use Silex\Provider\FormServiceProvider;
+use Symfony\Component\Form\Extension\Core\Type\FormType;
+use Symfony\Component\BrowserKit\Request;
+
 $app = new Silex\Application();
 
-$app->register(new Silex\Provider\TwigServiceProvider(), array(
-    'twig.path' => __DIR__.'/view',
-));
-$app->register(new Silex\Provider\UrlGeneratorServiceProvider());
+$app->register(new TwigServiceProvider(), ['twig.path' => __DIR__.'/view']);
+$app->register(new UrlGeneratorServiceProvider());
+$app->register(new FormServiceProvider());
 
 //links here is a table name
 $app['dbn'] = new dbNegotiator('links', require 'dbconf.php');
@@ -17,6 +22,25 @@ $app['dbn'] = new dbNegotiator('links', require 'dbconf.php');
 $app->get('/srv', function () use ($app) {
     //$result = $app['dbn']->getMain();
     return $app['twig']->render('create.twig', ['result' => []]);
+});
+
+$app->match('/form', function (Request $request) use ($app){
+    $data = [
+        'claimed_link' => '',
+        'expired_on' => '',
+        'password' => ''
+    ];
+    $form = $app['form.factory']->createBuilder(FormType::class, $data)
+        ->add('claimed_link')
+        ->add('expired_on')
+        ->add('password')
+        ->getForm();
+    $form->handleRequest($request);
+    if ($form->isValid()){
+        $data = $form->getData();
+        return $app->redirect();
+    }
+    return $app['twig']->render('test.twig', ['result' => [], 'form'=> $form->createView()]);
 });
 
 $app->get('/', function () use ($app) {
