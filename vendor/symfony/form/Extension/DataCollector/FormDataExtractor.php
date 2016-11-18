@@ -19,20 +19,12 @@ use Symfony\Component\Validator\ConstraintViolationInterface;
 /**
  * Default implementation of {@link FormDataExtractorInterface}.
  *
- * @since  2.4
- *
  * @author Bernhard Schussek <bschussek@gmail.com>
  */
 class FormDataExtractor implements FormDataExtractorInterface
 {
-    /**
-     * @var ValueExporter
-     */
     private $valueExporter;
 
-    /**
-     * Constructs a new data extractor.
-     */
     public function __construct(ValueExporter $valueExporter = null)
     {
         $this->valueExporter = $valueExporter ?: new ValueExporter();
@@ -46,7 +38,6 @@ class FormDataExtractor implements FormDataExtractorInterface
         $data = array(
             'id' => $this->buildId($form),
             'name' => $form->getName(),
-            'type' => $form->getConfig()->getType()->getName(),
             'type_class' => get_class($form->getConfig()->getType()->getInnerType()),
             'synchronized' => $this->valueExporter->exportValue($form->isSynchronized()),
             'passed_options' => array(),

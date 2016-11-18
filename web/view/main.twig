@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Insert links</title>
+</head>
+<body>
+<p><a href="{{ path('create') }}">Create new entry</a></p>
+<p>Active entries:</p>
+
+{% if not (result == []) %}
+<table>
+    {% for item in result %}
+        <tr>
+            <td>Link: <a href="{{ path('link', {link: item.redirect_link}) }}">{{ item.claimed_link }}</a></td>
+            <td>Expiration: {% if(item.expired_on == '0')%} No
+                            {% else %} {{ item.expired_on|date('Y-m-d H:i:s') }}
+                            {% endif %}</td>
+            <td>Secured: {% if(item.password == '')%} No {% else %} Yes {% endif %}</td>
+        </tr>
+    {% endfor %}
+</table>
+{% else %}
+    <p>No active links found.</p>
+{% endif %}
+
+<p>Current time is: {{ 'now'|date('Y-m-d H:i:s') }}</p>
+</body>
+</html>

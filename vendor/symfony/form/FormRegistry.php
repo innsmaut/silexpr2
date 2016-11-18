@@ -35,11 +35,6 @@ class FormRegistry implements FormRegistryInterface
     private $types = array();
 
     /**
-     * @var string[]
-     */
-    private $legacyNames = array();
-
-    /**
      * @var FormTypeGuesserInterface|false|null
      */
     private $guesser = false;
@@ -53,7 +48,7 @@ class FormRegistry implements FormRegistryInterface
      * Constructor.
      *
      * @param FormExtensionInterface[]         $extensions          An array of FormExtensionInterface
-     * @param ResolvedFormTypeFactoryInterface $resolvedTypeFactory The factory for resolved form types.
+     * @param ResolvedFormTypeFactoryInterface $resolvedTypeFactory The factory for resolved form types
      *
      * @throws UnexpectedTypeException if any extension does not implement FormExtensionInterface
      */
@@ -93,11 +88,7 @@ class FormRegistry implements FormRegistryInterface
                 }
             }
 
-            $this->resolveAndAddType($type);
-        }
-
-        if (isset($this->legacyNames[$name])) {
-            @trigger_error(sprintf('Accessing type "%s" by its string name is deprecated since version 2.8 and will be removed in 3.0. Use the fully-qualified type class name "%s" instead.', $name, get_class($this->types[$name]->getInnerType())), E_USER_DEPRECATED);
+            $this->types[$name] = $this->resolveType($type);
         }
 
         return $this->types[$name];
@@ -107,34 +98,15 @@ class FormRegistry implements FormRegistryInterface
      * Wraps a type into a ResolvedFormTypeInterface implementation and connects
      * it with its parent type.
      *
-     * @param FormTypeInterface $type The type to resolve.
+     * @param FormTypeInterface $type The type to resolve
      *
-     * @return ResolvedFormTypeInterface The resolved type.
+     * @return ResolvedFormTypeInterface The resolved type
      */
-    private function resolveAndAddType(FormTypeInterface $type)
+    private function resolveType(FormTypeInterface $type)
     {
         $typeExtensions = array();
         $parentType = $type->getParent();
         $fqcn = get_class($type);
-        $name = $type->getName();
-        $hasCustomName = $name !== $fqcn;
-
-        if ($parentType instanceof FormTypeInterface) {
-            @trigger_error(sprintf('Returning a FormTypeInterface from %s::getParent() is deprecated since version 2.8 and will be removed in 3.0. Return the fully-qualified type class name instead.', $fqcn), E_USER_DEPRECATED);
-
-            $this->resolveAndAddType($parentType);
-            $parentType = $parentType->getName();
-        }
-
-        if ($hasCustomName) {
-            foreach ($this->extensions as $extension) {
-                if ($x = $extension->getTypeExtensions($name)) {
-                    @trigger_error(sprintf('Returning a type name from %s::getExtendedType() is deprecated since version 2.8 and will be removed in 3.0. Return the fully-qualified type class name instead.', get_class($x[0])), E_USER_DEPRECATED);
-
-                    $typeExtensions = array_merge($typeExtensions, $x);
-                }
-            }
-        }
 
         foreach ($this->extensions as $extension) {
             $typeExtensions = array_merge(
@@ -143,19 +115,11 @@ class FormRegistry implements FormRegistryInterface
             );
         }
 
-        $resolvedType = $this->resolvedTypeFactory->createResolvedType(
+        return $this->resolvedTypeFactory->createResolvedType(
             $type,
             $typeExtensions,
             $parentType ? $this->getType($parentType) : null
         );
-
-        $this->types[$fqcn] = $resolvedType;
-
-        if ($hasCustomName) {
-            // Enable access by the explicit type name until Symfony 3.0
-            $this->types[$name] = $resolvedType;
-            $this->legacyNames[$name] = true;
-        }
     }
 
     /**
@@ -163,10 +127,6 @@ class FormRegistry implements FormRegistryInterface
      */
     public function hasType($name)
     {
-        if (isset($this->legacyNames[$name])) {
-            @trigger_error(sprintf('Accessing type "%s" by its string name is deprecated since version 2.8 and will be removed in 3.0. Use the fully-qualified type class name "%s" instead.', $name, get_class($this->types[$name]->getInnerType())), E_USER_DEPRECATED);
-        }
-
         if (isset($this->types[$name])) {
             return true;
         }

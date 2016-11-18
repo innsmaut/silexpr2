@@ -11,8 +11,6 @@
 
 namespace Symfony\Component\Form\ChoiceList;
 
-use Symfony\Component\Form\Exception\UnexpectedTypeException;
-
 /**
  * A list of choices with arbitrary data types.
  *
@@ -64,12 +62,8 @@ class ArrayChoiceList implements ChoiceListInterface
      *                                    incrementing integers are used as
      *                                    values
      */
-    public function __construct($choices, $value = null)
+    public function __construct($choices, callable $value = null)
     {
-        if (null !== $value && !is_callable($value)) {
-            throw new UnexpectedTypeException($value, 'null or callable');
-        }
-
         if ($choices instanceof \Traversable) {
             $choices = iterator_to_array($choices);
         }
@@ -183,12 +177,13 @@ class ArrayChoiceList implements ChoiceListInterface
     /**
      * Flattens an array into the given output variables.
      *
-     * @param array    $choices         The array to flatten
-     * @param callable $value           The callable for generating choice values
-     * @param array    $choicesByValues The flattened choices indexed by the
-     *                                  corresponding values
-     * @param array    $keysByValues    The original keys indexed by the
-     *                                  corresponding values
+     * @param array    $choices          The array to flatten
+     * @param callable $value            The callable for generating choice values
+     * @param array    $choicesByValues  The flattened choices indexed by the
+     *                                   corresponding values
+     * @param array    $keysByValues     The original keys indexed by the
+     *                                   corresponding values
+     * @param array    $structuredValues The values indexed by the original keys
      *
      * @internal Must not be used by user-land code
      */
@@ -218,7 +213,7 @@ class ArrayChoiceList implements ChoiceListInterface
      * Checks whether the given choices can be cast to strings without
      * generating duplicates.
      *
-     * @param array      $choices The choices.
+     * @param array      $choices The choices
      * @param array|null $cache   The cache for previously checked entries. Internal
      *
      * @return bool Returns true if the choices can be cast to strings and

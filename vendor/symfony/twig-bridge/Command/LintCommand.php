@@ -58,7 +58,6 @@ class LintCommand extends Command
     protected function configure()
     {
         $this
-            ->setAliases(array('twig:lint'))
             ->setDescription('Lints a template and outputs encountered errors')
             ->addOption('format', null, InputOption::VALUE_REQUIRED, 'The output format', 'txt')
             ->addArgument('filename', InputArgument::IS_ARRAY)
@@ -66,18 +65,19 @@ class LintCommand extends Command
 The <info>%command.name%</info> command lints a template and outputs to STDOUT
 the first encountered syntax error.
 
-You can validate the syntax of a file:
+You can validate the syntax of contents passed from STDIN:
 
-<info>php %command.full_name% filename</info>
+  <info>cat filename | php %command.full_name%</info>
+
+Or the syntax of a file:
+
+  <info>php %command.full_name% filename</info>
 
 Or of a whole directory:
 
-<info>php %command.full_name% dirname</info>
-<info>php %command.full_name% dirname --format=json</info>
+  <info>php %command.full_name% dirname</info>
+  <info>php %command.full_name% dirname --format=json</info>
 
-You can also pass the template contents from STDIN:
-
-<info>cat filename | php %command.full_name%</info>
 EOF
             )
         ;
@@ -86,10 +86,6 @@ EOF
     protected function execute(InputInterface $input, OutputInterface $output)
     {
         $io = new SymfonyStyle($input, $output);
-
-        if (false !== strpos($input->getFirstArgument(), ':l')) {
-            $io->caution('The use of "twig:lint" command is deprecated since version 2.7 and will be removed in 3.0. Use the "lint:twig" instead.');
-        }
 
         if (null === $twig = $this->getTwigEnvironment()) {
             $io->error('The Twig environment needs to be set.');
@@ -206,7 +202,7 @@ EOF
             }
         });
 
-        $output->writeln(json_encode($filesInfo, defined('JSON_PRETTY_PRINT') ? JSON_PRETTY_PRINT : 0));
+        $output->writeln(json_encode($filesInfo, JSON_PRETTY_PRINT));
 
         return min($errors, 1);
     }
