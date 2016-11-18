@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Insert links</title>
+</head>
+<body>
+
+{% if not (result == []) %}
+    <p>New link to {{ result.claimed_link }}is available at
+        <a href="{{ path('link', {link: result.redirect_link}) }}">{{ result.redirect_link }}</a>
+        {% if not result.expired_on == 0 %} till {{ result.expired_on|date('Y-m-d H:i:s') }} {% endif %}.</p>
+{% else %}
+    {{ form_start(form) }}
+        {{ form_errors(form) }}
+
+        {{ form_row(form.claimed_link) }}
+        {{ form_row(form.expired_on) }}
+        {{ form_row(form.password) }}
+        <input type="submit" value="Submit">
+    {{ form_end(form) }}
+{% endif %}
+
+</body>
+</html>
