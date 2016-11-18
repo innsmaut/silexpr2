@@ -22,22 +22,16 @@ use Symfony\Component\Security\Core\Authentication\Token\AnonymousToken;
  */
 class AnonymousAuthenticationProvider implements AuthenticationProviderInterface
 {
-    /**
-     * Used to determine if the token is created by the application
-     * instead of a malicious client.
-     *
-     * @var string
-     */
-    private $secret;
+    private $key;
 
     /**
      * Constructor.
      *
-     * @param string $secret The secret shared with the AnonymousToken
+     * @param string $key The key shared with the authentication token
      */
-    public function __construct($secret)
+    public function __construct($key)
     {
-        $this->secret = $secret;
+        $this->key = $key;
     }
 
     /**
@@ -49,7 +43,7 @@ class AnonymousAuthenticationProvider implements AuthenticationProviderInterface
             return;
         }
 
-        if ($this->secret !== $token->getSecret()) {
+        if ($this->key !== $token->getKey()) {
             throw new BadCredentialsException('The Token does not contain the expected key.');
         }
 

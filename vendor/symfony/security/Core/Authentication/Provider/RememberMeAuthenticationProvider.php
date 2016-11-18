@@ -19,20 +19,20 @@ use Symfony\Component\Security\Core\Exception\BadCredentialsException;
 class RememberMeAuthenticationProvider implements AuthenticationProviderInterface
 {
     private $userChecker;
-    private $secret;
+    private $key;
     private $providerKey;
 
     /**
      * Constructor.
      *
      * @param UserCheckerInterface $userChecker An UserCheckerInterface interface
-     * @param string               $secret      A secret
-     * @param string               $providerKey A provider secret
+     * @param string               $key         A key
+     * @param string               $providerKey A provider key
      */
-    public function __construct(UserCheckerInterface $userChecker, $secret, $providerKey)
+    public function __construct(UserCheckerInterface $userChecker, $key, $providerKey)
     {
         $this->userChecker = $userChecker;
-        $this->secret = $secret;
+        $this->key = $key;
         $this->providerKey = $providerKey;
     }
 
@@ -45,14 +45,14 @@ class RememberMeAuthenticationProvider implements AuthenticationProviderInterfac
             return;
         }
 
-        if ($this->secret !== $token->getSecret()) {
-            throw new BadCredentialsException('The presented secret does not match.');
+        if ($this->key !== $token->getKey()) {
+            throw new BadCredentialsException('The presented key does not match.');
         }
 
         $user = $token->getUser();
         $this->userChecker->checkPreAuth($user);
 
-        $authenticatedToken = new RememberMeToken($user, $this->providerKey, $this->secret);
+        $authenticatedToken = new RememberMeToken($user, $this->providerKey, $this->key);
         $authenticatedToken->setAttributes($token->getAttributes());
 
         return $authenticatedToken;

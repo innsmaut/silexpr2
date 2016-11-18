@@ -12,6 +12,7 @@
 namespace Symfony\Component\Security\Csrf\TokenGenerator;
 
 use Symfony\Component\Security\Core\Util\SecureRandomInterface;
+use Symfony\Component\Security\Core\Util\SecureRandom;
 
 /**
  * Generates CSRF tokens.
@@ -23,6 +24,13 @@ use Symfony\Component\Security\Core\Util\SecureRandomInterface;
 class UriSafeTokenGenerator implements TokenGeneratorInterface
 {
     /**
+     * The generator for random values.
+     *
+     * @var SecureRandomInterface
+     */
+    private $random;
+
+    /**
      * The amount of entropy collected for each token (in bits).
      *
      * @var int
@@ -32,17 +40,15 @@ class UriSafeTokenGenerator implements TokenGeneratorInterface
     /**
      * Generates URI-safe CSRF tokens.
      *
-     * @param int $entropy The amount of entropy collected for each token (in bits)
+     * @param SecureRandomInterface|null $random  The random value generator used for
+     *                                            generating entropy
+     * @param int                        $entropy The amount of entropy collected for
+     *                                            each token (in bits)
      */
-    public function __construct($entropy = 256)
+    public function __construct(SecureRandomInterface $random = null, $entropy = 256)
     {
-        if ($entropy instanceof SecureRandomInterface || func_num_args() === 2) {
-            @trigger_error('The '.__METHOD__.' method now requires the entropy to be given as the first argument. The SecureRandomInterface will be removed in 3.0.', E_USER_DEPRECATED);
-
-            $this->entropy = func_num_args() === 2 ? func_get_arg(1) : 256;
-        } else {
-            $this->entropy = $entropy;
-        }
+        $this->random = $random ?: new SecureRandom();
+        $this->entropy = $entropy;
     }
 
     /**
@@ -53,7 +59,7 @@ class UriSafeTokenGenerator implements TokenGeneratorInterface
         // Generate an URI safe base64 encoded string that does not contain "+",
         // "/" or "=" which need to be URL encoded and make URLs unnecessarily
         // longer.
-        $bytes = random_bytes($this->entropy / 8);
+        $bytes = $this->random->nextBytes($this->entropy / 8);
 
         return rtrim(strtr(base64_encode($bytes), '+/', '-_'), '=');
     }

@@ -20,7 +20,7 @@ use Symfony\Component\Security\Core\User\UserInterface;
  */
 class RememberMeToken extends AbstractToken
 {
-    private $secret;
+    private $key;
     private $providerKey;
 
     /**
@@ -28,16 +28,16 @@ class RememberMeToken extends AbstractToken
      *
      * @param UserInterface $user
      * @param string        $providerKey
-     * @param string        $secret      A secret used to make sure the token is created by the app and not by a malicious client
+     * @param string        $key
      *
      * @throws \InvalidArgumentException
      */
-    public function __construct(UserInterface $user, $providerKey, $secret)
+    public function __construct(UserInterface $user, $providerKey, $key)
     {
         parent::__construct($user->getRoles());
 
-        if (empty($secret)) {
-            throw new \InvalidArgumentException('$secret must not be empty.');
+        if (empty($key)) {
+            throw new \InvalidArgumentException('$key must not be empty.');
         }
 
         if (empty($providerKey)) {
@@ -45,7 +45,7 @@ class RememberMeToken extends AbstractToken
         }
 
         $this->providerKey = $providerKey;
-        $this->secret = $secret;
+        $this->key = $key;
 
         $this->setUser($user);
         parent::setAuthenticated(true);
@@ -64,9 +64,9 @@ class RememberMeToken extends AbstractToken
     }
 
     /**
-     * Returns the provider secret.
+     * Returns the provider key.
      *
-     * @return string The provider secret
+     * @return string The provider key
      */
     public function getProviderKey()
     {
@@ -74,23 +74,13 @@ class RememberMeToken extends AbstractToken
     }
 
     /**
-     * @deprecated Since version 2.8, to be removed in 3.0. Use getSecret() instead.
+     * Returns the key.
+     *
+     * @return string The Key
      */
     public function getKey()
     {
-        @trigger_error(__method__.'() is deprecated since version 2.8 and will be removed in 3.0. Use getSecret() instead.', E_USER_DEPRECATED);
-
-        return $this->getSecret();
-    }
-
-    /**
-     * Returns the secret.
-     *
-     * @return string
-     */
-    public function getSecret()
-    {
-        return $this->secret;
+        return $this->key;
     }
 
     /**
@@ -107,7 +97,7 @@ class RememberMeToken extends AbstractToken
     public function serialize()
     {
         return serialize(array(
-            $this->secret,
+            $this->key,
             $this->providerKey,
             parent::serialize(),
         ));
@@ -118,7 +108,7 @@ class RememberMeToken extends AbstractToken
      */
     public function unserialize($serialized)
     {
-        list($this->secret, $this->providerKey, $parentStr) = unserialize($serialized);
+        list($this->key, $this->providerKey, $parentStr) = unserialize($serialized);
         parent::unserialize($parentStr);
     }
 }

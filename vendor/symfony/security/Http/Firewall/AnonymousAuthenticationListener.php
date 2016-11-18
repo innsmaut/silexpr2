@@ -27,14 +27,14 @@ use Symfony\Component\Security\Core\Authentication\Token\AnonymousToken;
 class AnonymousAuthenticationListener implements ListenerInterface
 {
     private $tokenStorage;
-    private $secret;
+    private $key;
     private $authenticationManager;
     private $logger;
 
-    public function __construct(TokenStorageInterface $tokenStorage, $secret, LoggerInterface $logger = null, AuthenticationManagerInterface $authenticationManager = null)
+    public function __construct(TokenStorageInterface $tokenStorage, $key, LoggerInterface $logger = null, AuthenticationManagerInterface $authenticationManager = null)
     {
         $this->tokenStorage = $tokenStorage;
-        $this->secret = $secret;
+        $this->key = $key;
         $this->authenticationManager = $authenticationManager;
         $this->logger = $logger;
     }
@@ -51,7 +51,7 @@ class AnonymousAuthenticationListener implements ListenerInterface
         }
 
         try {
-            $token = new AnonymousToken($this->secret, 'anon.', array());
+            $token = new AnonymousToken($this->key, 'anon.', array());
             if (null !== $this->authenticationManager) {
                 $token = $this->authenticationManager->authenticate($token);
             }

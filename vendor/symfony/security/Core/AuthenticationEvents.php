@@ -20,8 +20,6 @@ final class AuthenticationEvents
      * The event listener method receives a
      * Symfony\Component\Security\Core\Event\AuthenticationEvent instance.
      *
-     * @Event
-     *
      * @var string
      */
     const AUTHENTICATION_SUCCESS = 'security.authentication.success';
@@ -33,8 +31,6 @@ final class AuthenticationEvents
      * The event listener method receives a
      * Symfony\Component\Security\Core\Event\AuthenticationFailureEvent
      * instance.
-     *
-     * @Event
      *
      * @var string
      */

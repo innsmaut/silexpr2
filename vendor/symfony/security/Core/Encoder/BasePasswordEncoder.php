@@ -11,6 +11,8 @@
 
 namespace Symfony\Component\Security\Core\Encoder;
 
+use Symfony\Component\Security\Core\Util\StringUtils;
+
 /**
  * BasePasswordEncoder is the base class for all password encoders.
  *
@@ -81,7 +83,7 @@ abstract class BasePasswordEncoder implements PasswordEncoderInterface
      */
     protected function comparePasswords($password1, $password2)
     {
-        return hash_equals($password1, $password2);
+        return StringUtils::equals($password1, $password2);
     }
 
     /**

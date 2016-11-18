@@ -27,11 +27,9 @@ interface VoterInterface
     /**
      * Checks if the voter supports the given attribute.
      *
-     * @param mixed $attribute An attribute (usually the attribute name string)
+     * @param string $attribute An attribute
      *
      * @return bool true if this Voter supports the attribute, false otherwise
-     *
-     * @deprecated since version 2.8, to be removed in 3.0.
      */
     public function supportsAttribute($attribute);
 
@@ -41,8 +39,6 @@ interface VoterInterface
      * @param string $class A class name
      *
      * @return bool true if this Voter can process the class
-     *
-     * @deprecated since version 2.8, to be removed in 3.0.
      */
     public function supportsClass($class);
 

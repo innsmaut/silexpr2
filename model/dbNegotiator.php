@@ -1,5 +1,9 @@
 <?php
 
+namespace MyModels;
+
+use \Doctrine\DBAL\DriverManager;
+
 class dbNegotiator{
     private $sql;
     private $conn;
@@ -7,7 +11,7 @@ class dbNegotiator{
     public $result;
 
     public function __construct($table, $connectionParams){
-        $this->conn = \Doctrine\DBAL\DriverManager::getConnection($connectionParams);
+        $this->conn = DriverManager::getConnection($connectionParams);
         $this->table = $table;
     }
 
@@ -29,8 +33,8 @@ class dbNegotiator{
 
     public function getLinkPost($args){
         $this->sql = "SELECT * FROM {$this->table} 
-                WHERE (redirect_link = '{$args[0]}')
-                AND (password = '{$args[1]}')
+                WHERE (redirect_link = '{$args['link']}')
+                AND (password = '{$args['password']}')
                 AND ((expired_on >= '{$this->timer()}') OR (expired_on = '0'))";
         return $this->conn->fetchAll($this->sql);
     }

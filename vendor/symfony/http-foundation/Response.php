@@ -258,7 +258,7 @@ class Response
      *
      * @param Request $request A Request instance
      *
-     * @return Response The current response.
+     * @return Response The current response
      */
     public function prepare(Request $request)
     {
@@ -1004,7 +1004,7 @@ class Response
      */
     public function isNotModified(Request $request)
     {
-        if (!$request->isMethodSafe()) {
+        if (!$request->isMethodCacheable()) {
             return false;
         }
 
