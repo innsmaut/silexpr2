@@ -7,14 +7,19 @@ require_once 'dbNegotiator.php';
 use Silex\Provider\TwigServiceProvider;
 use Silex\Provider\UrlGeneratorServiceProvider;
 use Silex\Provider\FormServiceProvider;
+use Silex\Provider\TranslationServiceProvider;
 use Symfony\Component\Form\Extension\Core\Type\FormType;
-use Symfony\Component\BrowserKit\Request;
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\Form\Extension\Core\Type\UrlType;
+use Symfony\Component\Form\Extension\Core\Type\TimeType;
+use Symfony\Component\Form\Extension\Core\Type\TextType;
 
 $app = new Silex\Application();
 
 $app->register(new TwigServiceProvider(), ['twig.path' => __DIR__.'/view']);
 $app->register(new UrlGeneratorServiceProvider());
 $app->register(new FormServiceProvider());
+$app->register(new TranslationServiceProvider());
 
 //links here is a table name
 $app['dbn'] = new dbNegotiator('links', require 'dbconf.php');
@@ -24,23 +29,27 @@ $app->get('/srv', function () use ($app) {
     return $app['twig']->render('create.twig', ['result' => []]);
 });
 
-$app->match('/form', function (Request $request) use ($app){
-    $data = [
-        'claimed_link' => '',
-        'expired_on' => '',
-        'password' => ''
-    ];
-    $form = $app['form.factory']->createBuilder(FormType::class, $data)
-        ->add('claimed_link')
-        ->add('expired_on')
-        ->add('password')
+$app->match('/create', function (Request $request) use ($app){
+    $result = [];
+    $form = $app['form.factory']->createBuilder(FormType::class)
+        ->add('claimed_link', UrlType::class)
+        ->add('expired_on', TimeType::class, ['input' => 'timestamp'])
+        ->add('password', TextType::class, ['required' => false])
         ->getForm();
-    $form->handleRequest($request);
-    if ($form->isValid()){
-        $data = $form->getData();
-        return $app->redirect();
+    if(isset($request)){
+        $form->handleRequest($request);
+        if ($form->isSubmitted() && $form->isValid()){
+            $result = $form->getData();
+            $result['redirect_link'] = md5($result['claimed_link'].date_timestamp_get(date_create()));
+            $result['expired_on'] += 3600; //this form returns -3600 timestamp instead of 0, maybe locale problems
+            if($result['expired_on'] !== 0) {
+                $result['expired_on'] += date_timestamp_get(date_create());
+            }
+            $result['password'] = ($result['password'])?:'';
+            $app['dbn']->setNew($result);
+        }
     }
-    return $app['twig']->render('test.twig', ['result' => [], 'form'=> $form->createView()]);
+    return $app['twig']->render('create.twig', ['result' => $result, 'form'=> $form->createView()]);
 });
 
 $app->get('/', function () use ($app) {
@@ -48,26 +57,28 @@ $app->get('/', function () use ($app) {
     return $app['twig']->render('main.twig', ['result' => $result]);
 });
 
-$app->get('/create', function () use ($app) {
-    return $app['twig']->render('create.twig', ['result' => []]);
-})->bind('create');
-
-//unsetting POST variables to prevent reuse
-$app->post('/create', function () use($app) {
-    if (isset($_POST['claimed_link'])){
-        $redirectLink = md5($_POST['claimed_link'].date_timestamp_get(date_create()));
-        $expiredOn = ($_POST['expired_on'] === '')?'':date_timestamp_get(date_add(date_create(),
-            date_interval_create_from_date_string($_POST['expired_on'].' minutes')));
-        $newLine = [
-            'claimed_link' => $_POST['claimed_link'],
-            'redirect_link' => $redirectLink,
-            'password' => $_POST['password'],
-            'expired_on' => $expiredOn
-        ];
-        $app['dbn']->setNew($newLine);
-        return $app['twig']->render('create.twig', ['result' => $newLine]);
+$app->match('/create', function (Request $request) use ($app){
+    $result = [];
+    $form = $app['form.factory']->createBuilder(FormType::class)
+        ->add('claimed_link', UrlType::class)
+        ->add('expired_on', TimeType::class, ['input' => 'timestamp'])
+        ->add('password', TextType::class, ['required' => false])
+        ->getForm();
+    if(isset($request)){
+        $form->handleRequest($request);
+        if ($form->isSubmitted() && $form->isValid()){
+            $result = $form->getData();
+            $result['redirect_link'] = md5($result['claimed_link'].date_timestamp_get(date_create()));
+            $result['expired_on'] += 3600; //this form returns -3600 timestamp instead of 0, maybe locale problems
+            if($result['expired_on'] !== 0) {
+                $result['expired_on'] += date_timestamp_get(date_create());
+            }
+            $result['password'] = ($result['password'])?:'';
+            $app['dbn']->setNew($result);
+        }
     }
-})->after(function (){unset($_POST['claimed_link'], $_POST['expired_on'], $_POST['password']);});
+    return $app['twig']->render('create.twig', ['result' => $result, 'form'=> $form->createView()]);
+});
 
 $app->get('/{link}', function ($link) use ($app){
     $result = $app['dbn']->getLinkGet($link);
