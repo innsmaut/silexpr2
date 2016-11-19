@@ -39,6 +39,10 @@ class dbNegotiator{
         return $this->conn->fetchAll($this->sql);
     }
 
+    public function deleteLink($args){
+        $this->conn->delete($this->table, $args);
+    }
+
     private function timer(){
         return date_timestamp_get(date_create());
     }

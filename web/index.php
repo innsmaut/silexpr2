@@ -6,6 +6,7 @@ use Silex\Provider\TwigServiceProvider;
 use Silex\Provider\UrlGeneratorServiceProvider;
 use Silex\Provider\FormServiceProvider;
 use Silex\Provider\TranslationServiceProvider;
+use Silex\Provider\SessionServiceProvider;
 use Symfony\Component\Form\Extension\Core\Type\FormType;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Form\Extension\Core\Type\UrlType;
@@ -15,10 +16,11 @@ use MyModels\dbNegotiator;
 
 $app = new Silex\Application();
 
-$app->register(new TwigServiceProvider(), ['twig.path' => __DIR__.'/view']);
 $app->register(new UrlGeneratorServiceProvider());
 $app->register(new FormServiceProvider());
 $app->register(new TranslationServiceProvider());
+$app->register(new SessionServiceProvider(), ['session.test' => false !== getenv('TEST')]); //for testing twig forms
+$app->register(new TwigServiceProvider(), ['twig.path' => __DIR__.'/view']);
 
 //@links here is a table name
 $app['dbn'] = new dbNegotiator('links', require 'dbconf.php');
@@ -54,6 +56,12 @@ $app->match('/create', function (Request $request) use ($app){
     return $app['twig']->render('create.twig', ['result' => $result, 'form'=> $form->createView()]);
 })->bind('create');
 
+//delete link from database
+$app->get('/delete{id}', function ($id) use($app){
+    $app['dbn']->deleteLink(['id' => $id]);
+    return $app->redirect('/');
+})->bind('delete');
+
 //handles access to created links
 $app->match('/{link}', function ($link, Request $request) use ($app){
     $result = $app['dbn']->getLinkGet($link);;
@@ -88,6 +96,6 @@ $app->match('/{link}', function ($link, Request $request) use ($app){
     }
 })->bind('link');
 
-//$app['debug'] = true;
+$app['debug'] = true;
 
 $app->run();

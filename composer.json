@@ -1,10 +1,8 @@
 {
     "require": {
         "silex/silex": "~1.1",
-        "symfony/browser-kit": "~2.3",
         "symfony/console": "~2.3",
         "symfony/config": "^3.1",
-        "symfony/css-selector": "~2.3",
         "symfony/dom-crawler": "~2.3",
         "symfony/filesystem": "~2.3",
         "symfony/finder": "~2.3",
@@ -19,9 +17,17 @@
         "symfony/twig-bridge": "^3.1",
         "doctrine/dbal": "~2.2",
         "swiftmailer/swiftmailer": "5.*",
-        "twig/twig": "~1.0"
+        "twig/twig": "~1.0",
+        "phpunit/phpunit": "^5.6"
     },
     "autoload": {
-        "psr-4": {"MyModels\\": "model/"}
+        "psr-4": {
+            "MyModels\\": "model/",
+            "MyTests\\": "tests/"
+        }
+    },
+    "require-dev": {
+        "symfony/browser-kit": "^3.1",
+        "symfony/css-selector": "^3.1"
     }
 }

@@ -12,6 +12,7 @@
       <sourceFolder url="file://$MODULE_DIR$/vendor/doctrine/annotations/lib" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/vendor/monolog/monolog/src" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/vendor/silex/silex/src" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/tests" isTestSource="true" />
     </content>
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
