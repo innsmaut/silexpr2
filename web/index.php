@@ -33,7 +33,6 @@ $app->get('/', function () use ($app) {
 
 //handles creating new links
 $app->match('/create', function (Request $request) use ($app){
-    $result = [];
     $form = $app['form.factory']->createBuilder(FormType::class)
         ->add('claimed_link', UrlType::class)
         ->add('expired_on', TimeType::class, ['input' => 'timestamp'])
@@ -44,14 +43,14 @@ $app->match('/create', function (Request $request) use ($app){
         $form->handleRequest($request);
         if ($form->isSubmitted() && $form->isValid()){
             $result = $form->getData();
-            $result['redirect_link'] = md5($result['claimed_link'].date_timestamp_get(date_create()));
+            $result['redirect_link'] = md5($result['claimed_link'].date_create()->getTimestamp());
             $result['expired_on'] += 3600; //winter time shift, local timezone problems
-            if($result['expired_on'] !== 0) {
-                $result['expired_on'] += date_timestamp_get(date_create());
-            }
+            $result['expired_on'] === 0 || $result['expired_on'] += date_create()->getTimestamp();
             $result['password'] = ($result['password'])?:'';
             $app['dbn']->setNew($result);
         }
+    } else {
+        $result = [];
     }
     return $app['twig']->render('create.twig', ['result' => $result, 'form'=> $form->createView()]);
 })->bind('create');
@@ -64,7 +63,7 @@ $app->get('/delete{id}', function ($id) use($app){
 
 //handles access to created links
 $app->match('/{link}', function ($link, Request $request) use ($app){
-    $result = $app['dbn']->getSelect(['redirect_link' => $link]);;
+    $result = $app['dbn']->getSelect(['redirect_link' => $link]);
     //whether link was found
     if ($result !== []){
         //whether password is required

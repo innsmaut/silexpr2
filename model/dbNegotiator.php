@@ -22,7 +22,7 @@ class dbNegotiator{
     }
 
     public function getSelect($args = null){
-        $time = date_timestamp_get(date_create());
+        $time = date_create()->getTimestamp();
         $query = $this->conn->createQueryBuilder()->select('*')->from($this->table)
             ->where("expired_on >= '{$time}'")->orWhere("expired_on = '0'");
         if ($args !== null){
