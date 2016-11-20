@@ -27,7 +27,7 @@ $app['dbn'] = new dbNegotiator('links', require 'dbconf.php');
 
 //main page
 $app->get('/', function () use ($app) {
-    $result = $app['dbn']->getMain();
+    $result = $app['dbn']->getSelect();
     return $app['twig']->render('main.twig', ['result' => $result]);
 })->bind('main');
 
@@ -64,7 +64,7 @@ $app->get('/delete{id}', function ($id) use($app){
 
 //handles access to created links
 $app->match('/{link}', function ($link, Request $request) use ($app){
-    $result = $app['dbn']->getLinkGet($link);;
+    $result = $app['dbn']->getSelect(['redirect_link' => $link]);;
     //whether link was found
     if ($result !== []){
         //whether password is required
@@ -75,8 +75,8 @@ $app->match('/{link}', function ($link, Request $request) use ($app){
             if(isset($request) && $request->getMethod() === 'POST'){
                 $form->handleRequest($request);
                 if ($form->isSubmitted() && $form->isValid()){
-                    $result = $app['dbn']->getLinkPost([
-                        'link' => $link,
+                    $result = $app['dbn']->getSelect([
+                        'redirect_link' => $link,
                         'password' => $form->getData()['password']
                     ]);
                     if ($result !== []){
@@ -91,9 +91,8 @@ $app->match('/{link}', function ($link, Request $request) use ($app){
         } else {
             return $app->redirect($result[0]['claimed_link']);
         }
-    } else {
-        return $app->abort(404, 'No link found!');
     }
+    return $app->abort(404, 'No link found!');
 })->bind('link');
 
 $app['debug'] = true;

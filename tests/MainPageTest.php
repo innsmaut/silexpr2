@@ -25,7 +25,7 @@ class MainPageTest extends WebTestCase
         $crawler = $client->request('GET', '/');
 
         $this->assertCount(1, $crawler->filter('p:contains("Current time is:")'));
-        $this->assertContains(date_create()->format('Y-m-d H:i:s'),
+        $this->assertContains(date_create()->format('Y-m-d H:i'),
             $crawler->filter('p:contains("Current time is:")')->getNode(0)->textContent);
     }
 
