@@ -33,6 +33,7 @@ $app->get('/', function () use ($app) {
 
 //handles creating new links
 $app->match('/create', function (Request $request) use ($app){
+    $result = [];
     $form = $app['form.factory']->createBuilder(FormType::class)
         ->add('claimed_link', UrlType::class)
         ->add('expired_on', TimeType::class, ['input' => 'timestamp'])
@@ -49,8 +50,6 @@ $app->match('/create', function (Request $request) use ($app){
             $result['password'] = ($result['password'])?:'';
             $app['dbn']->setNew($result);
         }
-    } else {
-        $result = [];
     }
     return $app['twig']->render('create.twig', ['result' => $result, 'form'=> $form->createView()]);
 })->bind('create');
