@@ -1,0 +1,8 @@
+CREATE TABLE `links` (
+ `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
+ `claimed_link` varchar(255) NOT NULL,
+ `redirect_link` varchar(255) NOT NULL,
+ `password` varchar(255) NOT NULL,
+ `expired_on` int(11) NOT NULL,
+ PRIMARY KEY (`id`)
+)
