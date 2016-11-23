@@ -11,12 +11,16 @@ final class dbNegotiator{
 
     static public function getInstance($args){
         if (self::$instance===null){
-            self::$instance = self::$instance = new static();
+            self::$instance = new static();
             self::$conn = DriverManager::getConnection($args['doctrineConf']);
             self::$table = $args['tableName'];
         }
         return self::$instance;
     }
+
+    private function __construct(){}
+    private function __colone(){}
+    private function __wakeup(){}
 
     public function setNew(array $args){
         self::$conn->insert(self::$table, $args);

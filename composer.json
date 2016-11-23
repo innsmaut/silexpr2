@@ -23,6 +23,7 @@
     "autoload": {
         "psr-4": {
             "MyModels\\": "model/",
+            "MyControllers\\": "controller/",
             "MyTests\\": "tests/"
         }
     },

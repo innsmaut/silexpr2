@@ -8,9 +8,9 @@
 <p>Active entries:</p>
 
 {% if not (result == []) %}
-<table>
+<table id="table">
     {% for item in result %}
-        <tr>
+        <tr id="{{ item.id }}">
             <td>Link: <a href="{{ path('link', {link: item.redirect_link}) }}">{{ item.claimed_link }}</a></td>
             <td>Expiration: {% if(item.expired_on == '0')%} No
                             {% else %} {{ item.expired_on|date('Y-m-d H:i:s') }}

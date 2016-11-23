@@ -68,6 +68,7 @@ class ComposerStaticInit8007df90e558881eb2a815ddcd6563af
         array (
             'MyTests\\' => 8,
             'MyModels\\' => 9,
+            'MyControllers\\' => 14,
             'Monolog\\' => 8,
         ),
         'D' => 
@@ -226,6 +227,10 @@ class ComposerStaticInit8007df90e558881eb2a815ddcd6563af
         'MyModels\\' => 
         array (
             0 => __DIR__ . '/../..' . '/model',
+        ),
+        'MyControllers\\' => 
+        array (
+            0 => __DIR__ . '/../..' . '/controller',
         ),
         'Monolog\\' => 
         array (
