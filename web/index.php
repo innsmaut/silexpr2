@@ -21,10 +21,7 @@ $app->register(new FormServiceProvider());
 $app->register(new TranslationServiceProvider());
 $app->register(new SessionServiceProvider(), ['session.test' => false !== getenv('TEST')]); //for testing twig forms
 $app->register(new TwigServiceProvider(), ['twig.path' => __DIR__.'/view']);
-$app->register(new dbNegotiatorServiceProvider(), [
-    'dbn.tableName' => 'links', //links stands for table name
-    'dbn.dbConfig' => require 'dbconf.php'
-]);
+$app->register(new dbNegotiatorServiceProvider(), ['dbn.config' => require 'dbconf.php']);
 
 //main page
 $app->get('/', function () use ($app) {
@@ -40,6 +37,7 @@ $app->match('/create', function (Request $request) use ($app){
         ->add('expired_on', TimeType::class, ['input' => 'timestamp'])
         ->add('password', TextType::class, ['required' => false])
         ->getForm();
+
     //whether @request from 'create'-form exists
     if(isset($request)){
         $form->handleRequest($request);

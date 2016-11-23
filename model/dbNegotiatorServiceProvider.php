@@ -9,11 +9,10 @@ class dbNegotiatorServiceProvider implements ServiceProviderInterface
 {
     public function register(Application $app)
     {
-        $app['dbn.tableName'] = '';
-        $app['dbn.dbConfig'] = [];
+        $app['dbn.config'] = [];
         
         $app['dbn'] = $app->share(function ($app) {
-            return  new dbNegotiator($app['dbn.tableName'], $app['dbn.dbConfig']);
+            return  dbNegotiator::getInstance($app['dbn.config']);
         });
     }
 
