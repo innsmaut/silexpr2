@@ -27,6 +27,7 @@ class dbNegotiator{
             ->where("expired_on >= '{$time}'")->orWhere("expired_on = '0'");
         if ($args !== null){
             foreach ($args as $key => $value){
+                
                 $query->andWhere("{$key} = '{$value}'");
             }
         }

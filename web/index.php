@@ -12,7 +12,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Form\Extension\Core\Type\UrlType;
 use Symfony\Component\Form\Extension\Core\Type\TimeType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
-use MyModels\dbNegotiator;
+use MyModels\dbNegotiatorServiceProvider;
 
 $app = new Silex\Application();
 
@@ -21,9 +21,10 @@ $app->register(new FormServiceProvider());
 $app->register(new TranslationServiceProvider());
 $app->register(new SessionServiceProvider(), ['session.test' => false !== getenv('TEST')]); //for testing twig forms
 $app->register(new TwigServiceProvider(), ['twig.path' => __DIR__.'/view']);
-
-//@links here is a table name
-$app['dbn'] = new dbNegotiator('links', require 'dbconf.php');
+$app->register(new dbNegotiatorServiceProvider(), [
+    'dbn.tableName' => 'links', //links stands for table name
+    'dbn.dbConfig' => require 'dbconf.php'
+]);
 
 //main page
 $app->get('/', function () use ($app) {
