@@ -17,12 +17,12 @@ class SecuredUrlsTest extends WebTestCase
         $client = $this->createClient();
         $client->request('GET', '/c0fe6798d299d050259a21c821583c58');
 
-        $this->assertTrue($client->getResponse()->isOk());
+        $this->assertTrue($client->getResponse()->isRedirect());
     }
 
     public function testSecuredPageRedirectToMain(){
         $client = $this->createClient();
-        $crawler = $client->request('GET', '/c0fe6798d299d050259a21c821583c58');
+        $crawler = $client->request('GET', '/c0fe6798d299d050259a21c821583c58/password');
 
         $link = $crawler->filter('a:contains("Back to main page.")')->link();
         $this->assertEquals('http://localhost/', $link->getUri());
@@ -40,7 +40,7 @@ class SecuredUrlsTest extends WebTestCase
 
     public function testPasswordInputIncorrect(){
         $client = $this->createClient();
-        $crawler = $client->request('GET', '/c0fe6798d299d050259a21c821583c58');
+        $crawler = $client->request('GET', '/c0fe6798d299d050259a21c821583c58/password');
 
         $form = $crawler->selectButton('Submit')->form();
         $form['form[password]'] = 'wrong';
@@ -51,7 +51,7 @@ class SecuredUrlsTest extends WebTestCase
 
     public function testPasswordInputCorrect(){
         $client = $this->createClient();
-        $crawler = $client->request('GET', '/c0fe6798d299d050259a21c821583c58');
+        $crawler = $client->request('GET', '/c0fe6798d299d050259a21c821583c58/password');
 
         $form = $crawler->selectButton('Submit')->form();
         $form['form[password]'] = '123';

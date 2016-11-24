@@ -22,8 +22,7 @@ class CreatePageController implements ControllerProviderInterface
                 ->add('expired_on', TimeType::class, ['input' => 'timestamp'])
                 ->add('password', TextType::class, ['required' => false])
                 ->getForm();
-
-            //whether @request from 'create'-form exists
+            
             if(isset($request)){
                 $form->handleRequest($request);
                 if ($form->isSubmitted() && $form->isValid()){
